@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2021-02-10</span>
+<span id="revdate">2026-10-24</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -763,10 +763,8 @@ b.conum * { color: inherit !important; }
 <li><a href="#_concepts">7. Concepts</a>
 <ul class="sectlevel2">
 <li><a href="#_job_overview">7.1. Job overview</a>
-<ul class="sectlevel4">
+<ul class="sectlevel3">
 <li><a href="#_api_jobs_vs_agent_cli_jobs">7.1.1. API jobs vs agent CLI jobs</a></li>
-<li><a href="#_job_lifecycle">7.1.2. Job Lifecycle</a></li>
-<li><a href="#_status_transitions">7.1.3. Status Transitions</a></li>
 </ul>
 </li>
 <li><a href="#_data_model">7.2. Data Model</a>
@@ -812,8 +810,12 @@ b.conum * { color: inherit !important; }
 </ul>
 </li>
 <li><a href="#_internals">9. Internals</a>
+<ul class="sectlevel2">
+<li><a href="#_leader_election">9.1. Leader election</a>
 <ul class="sectlevel3">
-<li><a href="#_leader_election">9.1. Leader election</a></li>
+<li><a href="#_leader_tasks">9.1.1. Leader tasks</a></li>
+</ul>
+</li>
 <li><a href="#_execution_stages">9.2. Execution stages</a></li>
 <li><a href="#_the_run_script_2">9.3. The <code>run</code> script</a></li>
 <li><a href="#_agent_heartbeat_and_routing">9.4. Agent heartbeat and routing</a></li>
@@ -821,7 +823,13 @@ b.conum * { color: inherit !important; }
 <li><a href="#_agent_logging">9.6. Agent logging</a></li>
 <li><a href="#_interactive_mode">9.7. Interactive mode</a></li>
 <li><a href="#_persistence">9.8. Persistence</a></li>
-<li><a href="#_plug_in_selectors">9.9. Plug-in Selectors</a></li>
+<li><a href="#_plug_in_selectors">9.9. Plug-in Selectors</a>
+<ul class="sectlevel3">
+<li><a href="#_command_selector_script">9.9.1. Command selector script</a></li>
+<li><a href="#_cluster_selector_script">9.9.2. Cluster selector script</a></li>
+<li><a href="#_agent_launcher_selector_script">9.9.3. Agent launcher selector script</a></li>
+</ul>
+</li>
 <li><a href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></li>
 <li><a href="#_user_limits">9.11. User limits</a></li>
 <li><a href="#_job_attachments">9.12. Job attachments</a></li>
@@ -861,7 +869,7 @@ b.conum * { color: inherit !important; }
 </ul>
 </li>
 <li><a href="#_genie_agent">13. Genie Agent</a>
-<ul class="sectlevel3">
+<ul class="sectlevel2">
 <li><a href="#_properties_forwarding">13.1. Properties forwarding</a></li>
 </ul>
 </li>
@@ -1126,14 +1134,14 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 2.3.6.RELEASE</p>
+<p>Upgrade Spring Boot to 2.7.18</p>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Hoxton.SR9 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud 2021.0.2 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR9/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/2021.0.2/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1426,7 +1434,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -1593,8 +1601,8 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 <p>This section provides an high level overview of what a Genie job is.
 More details on the concepts covered here are provided in later sections.</p>
 </div>
-<div class="sect4">
-<h5 id="_api_jobs_vs_agent_cli_jobs"><a class="anchor" href="#_api_jobs_vs_agent_cli_jobs"></a><a class="link" href="#_api_jobs_vs_agent_cli_jobs">7.1.1. API jobs vs agent CLI jobs</a></h5>
+<div class="sect3">
+<h4 id="_api_jobs_vs_agent_cli_jobs"><a class="anchor" href="#_api_jobs_vs_agent_cli_jobs"></a><a class="link" href="#_api_jobs_vs_agent_cli_jobs">7.1.1. API jobs vs agent CLI jobs</a></h4>
 <div class="paragraph">
 <p>Genie provides 2 ways to execute a job:</p>
 </div>
@@ -1671,9 +1679,8 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </li>
 </ul>
 </div>
-</div>
 <div class="sect4">
-<h5 id="_job_lifecycle"><a class="anchor" href="#_job_lifecycle"></a><a class="link" href="#_job_lifecycle">7.1.2. Job Lifecycle</a></h5>
+<h5 id="_job_lifecycle"><a class="anchor" href="#_job_lifecycle"></a><a class="link" href="#_job_lifecycle">7.1.1.1. Job Lifecycle</a></h5>
 <div class="paragraph">
 <p>Regardless of how a job is launched, it will leverage Genie to:</p>
 </div>
@@ -1764,7 +1771,7 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_status_transitions"><a class="anchor" href="#_status_transitions"></a><a class="link" href="#_status_transitions">7.1.3. Status Transitions</a></h5>
+<h5 id="_status_transitions"><a class="anchor" href="#_status_transitions"></a><a class="link" href="#_status_transitions">7.1.1.2. Status Transitions</a></h5>
 <div class="paragraph">
 <p>Possible statuses of a job:</p>
 </div>
@@ -1879,11 +1886,13 @@ Genie for configuration, monitoring, audit, archival, etc.</p>
 </table>
 </div>
 </div>
+</div>
 <div class="sect2">
 <h3 id="_data_model"><a class="anchor" href="#_data_model"></a><a class="link" href="#_data_model">7.2. Data Model</a></h3>
 <div class="paragraph">
-<p>The Genie 4 data model contains several modifications and additions to the
-<a href="https://netflix.github.io/genie/concepts/3/DataModel.html">Genie 3 data model</a> to enable even more flexibility,
+<p>The Genie 4 data model contains several modifications and additions to the data models from Genie
+<a href="https://netflix.github.io/genie/concepts/2/DataModel.html">2</a> and
+<a href="https://netflix.github.io/genie/docs/3.3.9/reference/#_data_model">3</a> to enable even more flexibility,
 modularity and meta data retention. This section will go over the purpose of the various resources available from the
 Genie API and how they interact.</p>
 </div>
@@ -4421,14 +4430,14 @@ administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their ne
 <div class="paragraph">
 <p>This section provides an overview of Genie subsystems and components.</p>
 </div>
-<div class="sect3">
-<h4 id="_leader_election"><a class="anchor" href="#_leader_election"></a><a class="link" href="#_leader_election">9.1. Leader election</a></h4>
+<div class="sect2">
+<h3 id="_leader_election"><a class="anchor" href="#_leader_election"></a><a class="link" href="#_leader_election">9.1. Leader election</a></h3>
 <div class="paragraph">
 <p>Genie uses Zookeeper to elect an instance to be leader.
 An alternative leader election mechanism can be plugged in instead of Zookeeper.</p>
 </div>
-<div class="sect4">
-<h5 id="_leader_tasks"><a class="anchor" href="#_leader_tasks"></a><a class="link" href="#_leader_tasks">9.1.1. Leader tasks</a></h5>
+<div class="sect3">
+<h4 id="_leader_tasks"><a class="anchor" href="#_leader_tasks"></a><a class="link" href="#_leader_tasks">9.1.1. Leader tasks</a></h4>
 <div class="paragraph">
 <p>The Genie instance elected leader of a given cluster performs different tasks:</p>
 </div>
@@ -4447,8 +4456,8 @@ An alternative leader election mechanism can be plugged in instead of Zookeeper.
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_execution_stages"><a class="anchor" href="#_execution_stages"></a><a class="link" href="#_execution_stages">9.2. Execution stages</a></h4>
+<div class="sect2">
+<h3 id="_execution_stages"><a class="anchor" href="#_execution_stages"></a><a class="link" href="#_execution_stages">9.2. Execution stages</a></h3>
 <div class="paragraph">
 <p>Every job is executed by a dedicated agent.
 This is true for both API-submitted jobs and CLI-initiated jobs.</p>
@@ -4588,13 +4597,13 @@ For example, if an agent is rejected by the cluster during the Handshake stage, 
 If a retryable stage runs out of attempts, then execution is aborted, which may skip following stages as appropriate.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_the_run_script_2"><a class="anchor" href="#_the_run_script_2"></a><a class="link" href="#_the_run_script_2">9.3. The <code>run</code> script</a></h4>
+<div class="sect2">
+<h3 id="_the_run_script_2"><a class="anchor" href="#_the_run_script_2"></a><a class="link" href="#_the_run_script_2">9.3. The <code>run</code> script</a></h3>
 <div class="paragraph">
 <p>Every job consists of a <code>bash</code> script that the agent composes, forks, and monitors.</p>
 </div>
 <div class="paragraph">
-<p>This separation allows treating every job the same way, wether they are Spark or Notebook kernels, or anything else.</p>
+<p>This separation allows treating every job the same way, whether they are Spark or Notebook kernels, or anything else.</p>
 </div>
 <div class="paragraph">
 <p>The structure of a <code>run</code> script is as follows:</p>
@@ -4652,8 +4661,8 @@ If a retryable stage runs out of attempts, then execution is aborted, which may 
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_agent_heartbeat_and_routing"><a class="anchor" href="#_agent_heartbeat_and_routing"></a><a class="link" href="#_agent_heartbeat_and_routing">9.4. Agent heartbeat and routing</a></h4>
+<div class="sect2">
+<h3 id="_agent_heartbeat_and_routing"><a class="anchor" href="#_agent_heartbeat_and_routing"></a><a class="link" href="#_agent_heartbeat_and_routing">9.4. Agent heartbeat and routing</a></h3>
 <div class="paragraph">
 <p>Each agent that successfully claimed a job maintains a gRPC connection to a server in the cluster and periodically sends heartbeats.</p>
 </div>
@@ -4668,15 +4677,15 @@ The routing table is used by Genie server instances to dispatch a kill request t
 That instance then forwards the request to the agent.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_agent_file_streaming"><a class="anchor" href="#_agent_file_streaming"></a><a class="link" href="#_agent_file_streaming">9.5. Agent file streaming</a></h4>
+<div class="sect2">
+<h3 id="_agent_file_streaming"><a class="anchor" href="#_agent_file_streaming"></a><a class="link" href="#_agent_file_streaming">9.5. Agent file streaming</a></h3>
 <div class="paragraph">
 <p>Each agent executing a job opens multiple streaming channels on top of a single connection to a server.
 These channels can be used to pull a file from the agent and serve it via REST API</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_agent_logging"><a class="anchor" href="#_agent_logging"></a><a class="link" href="#_agent_logging">9.6. Agent logging</a></h4>
+<div class="sect2">
+<h3 id="_agent_logging"><a class="anchor" href="#_agent_logging"></a><a class="link" href="#_agent_logging">9.6. Agent logging</a></h3>
 <div class="paragraph">
 <p>Log messages emitted by a genie agent are routed to <code>agent.log</code>.
 This file is created at a temporary location when the agent starts, and relocated to the job folder once the latter exists.</p>
@@ -4686,8 +4695,8 @@ This file is created at a temporary location when the agent starts, and relocate
 These messages are appended to <code>stderr</code> to avoid polluting the job command output (sent to <code>stdout</code>) such as query outputs.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_interactive_mode"><a class="anchor" href="#_interactive_mode"></a><a class="link" href="#_interactive_mode">9.7. Interactive mode</a></h4>
+<div class="sect2">
+<h3 id="_interactive_mode"><a class="anchor" href="#_interactive_mode"></a><a class="link" href="#_interactive_mode">9.7. Interactive mode</a></h3>
 <div class="paragraph">
 <p>Agent execute by default in non-interactive mode:</p>
 </div>
@@ -4724,10 +4733,10 @@ These messages are appended to <code>stderr</code> to avoid polluting the job co
 <p>All jobs launched by the server (as a result of an API job submission) execute in non-interactive mode.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_persistence"><a class="anchor" href="#_persistence"></a><a class="link" href="#_persistence">9.8. Persistence</a></h4>
+<div class="sect2">
+<h3 id="_persistence"><a class="anchor" href="#_persistence"></a><a class="link" href="#_persistence">9.8. Persistence</a></h3>
 <div class="paragraph">
-<p>Out of the box, Genie supports MySQL and Postgress persistence via JPA and Hibernate.</p>
+<p>Out of the box, Genie supports MySQL and Postgres persistence via JPA and Hibernate.</p>
 </div>
 <div class="paragraph">
 <p>H2 in-memory database is also supported for integration tests.</p>
@@ -4736,16 +4745,16 @@ These messages are appended to <code>stderr</code> to avoid polluting the job co
 <p>Other kinds of persistence can be plugged in either via JPA or by re-implementing the persistence interface with a different technology.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_plug_in_selectors"><a class="anchor" href="#_plug_in_selectors"></a><a class="link" href="#_plug_in_selectors">9.9. Plug-in Selectors</a></h4>
+<div class="sect2">
+<h3 id="_plug_in_selectors"><a class="anchor" href="#_plug_in_selectors"></a><a class="link" href="#_plug_in_selectors">9.9. Plug-in Selectors</a></h3>
 <div class="paragraph">
 <p>Genie provides a mechanism to load and invoke Groovy scripts, and even reload the script if it changes at runtime.</p>
 </div>
 <div class="paragraph">
-<p>This hooks are provided in order to plug-in custom logic:</p>
+<p>These hooks are provided in order to plug-in custom logic:</p>
 </div>
-<div class="sect5">
-<h6 id="_command_selector_script"><a class="anchor" href="#_command_selector_script"></a><a class="link" href="#_command_selector_script">9.9.1. Command selector script</a></h6>
+<div class="sect3">
+<h4 id="_command_selector_script"><a class="anchor" href="#_command_selector_script"></a><a class="link" href="#_command_selector_script">9.9.1. Command selector script</a></h4>
 <div class="paragraph">
 <p>A job command criteria may be broad enough to match multiple commands (for example, a Spark job may match 10 different Spark commands, one for each Spark version).</p>
 </div>
@@ -4757,8 +4766,8 @@ These messages are appended to <code>stderr</code> to avoid polluting the job co
 Or the job may be a good candidate to "canary" the newest and unstable version.</p>
 </div>
 </div>
-<div class="sect5">
-<h6 id="_cluster_selector_script"><a class="anchor" href="#_cluster_selector_script"></a><a class="link" href="#_cluster_selector_script">9.9.2. Cluster selector script</a></h6>
+<div class="sect3">
+<h4 id="_cluster_selector_script"><a class="anchor" href="#_cluster_selector_script"></a><a class="link" href="#_cluster_selector_script">9.9.2. Cluster selector script</a></h4>
 <div class="paragraph">
 <p>Clusters that are eligible to run a given job are filtered down by the command&#8217;s cluster criteria combined with the job&#8217;s cluster criteria.
 But the final match set may still contain more than one viable cluster.</p>
@@ -4771,8 +4780,8 @@ But the final match set may still contain more than one viable cluster.</p>
 Or route the job based on other attributes or metadata.</p>
 </div>
 </div>
-<div class="sect5">
-<h6 id="_agent_launcher_selector_script"><a class="anchor" href="#_agent_launcher_selector_script"></a><a class="link" href="#_agent_launcher_selector_script">9.9.3. Agent launcher selector script</a></h6>
+<div class="sect3">
+<h4 id="_agent_launcher_selector_script"><a class="anchor" href="#_agent_launcher_selector_script"></a><a class="link" href="#_agent_launcher_selector_script">9.9.3. Agent launcher selector script</a></h4>
 <div class="paragraph">
 <p>Genie supports multiple agent launcher.
 For example, a launcher that starts the job on bare metal on in the same host, a launcher that starts the job inside a Docker container, a launcher that delegates the job to something like Kubernetes.</p>
@@ -4785,8 +4794,8 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_job_state_change_notifications"><a class="anchor" href="#_job_state_change_notifications"></a><a class="link" href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></h4>
+<div class="sect2">
+<h3 id="_job_state_change_notifications"><a class="anchor" href="#_job_state_change_notifications"></a><a class="link" href="#_job_state_change_notifications">9.10. Job State Change Notifications</a></h3>
 <div class="paragraph">
 <p>Genie emits internal application events whenever a job changes state.</p>
 </div>
@@ -4794,8 +4803,8 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 <p>Genie includes 2 built-in components that consume theese events and publish notifications to Amazon SNS.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_user_limits"><a class="anchor" href="#_user_limits"></a><a class="link" href="#_user_limits">9.11. User limits</a></h4>
+<div class="sect2">
+<h3 id="_user_limits"><a class="anchor" href="#_user_limits"></a><a class="link" href="#_user_limits">9.11. User limits</a></h3>
 <div class="paragraph">
 <p>Genie can cap the maximum number of jobs that a given user is allowed to run.</p>
 </div>
@@ -4803,8 +4812,8 @@ For example, a launcher that starts the job on bare metal on in the same host, a
 <p>The global default can be adjusted, and overrides for individual users can be set higher or lower.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_job_attachments"><a class="anchor" href="#_job_attachments"></a><a class="link" href="#_job_attachments">9.12. Job attachments</a></h4>
+<div class="sect2">
+<h3 id="_job_attachments"><a class="anchor" href="#_job_attachments"></a><a class="link" href="#_job_attachments">9.12. Job attachments</a></h3>
 <div class="paragraph">
 <p>Genie allows API job requests to submit one or more attachments (by submitting a multi-part POST).
 These files are placed in the job directory before launch.</p>
@@ -4813,8 +4822,8 @@ These files are placed in the job directory before launch.</p>
 <p>Example usage include Presto scripts, and Spark application jars, and additional property files.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_job_archival"><a class="anchor" href="#_job_archival"></a><a class="link" href="#_job_archival">9.13. Job archival</a></h4>
+<div class="sect2">
+<h3 id="_job_archival"><a class="anchor" href="#_job_archival"></a><a class="link" href="#_job_archival">9.13. Job archival</a></h3>
 <div class="paragraph">
 <p>After a job is completed, successfully or not, job file outputs and logs can be archived for later access.</p>
 </div>
@@ -4883,7 +4892,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -4900,7 +4909,7 @@ docs for an example of how to do this.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4908,7 +4917,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -5168,7 +5177,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/Hoxton.SR9/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/">Spring Boot</a> reference documentation and the <a href="http://cloud.spring.io/spring-cloud-static/2021.0.2/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5372,12 +5381,18 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-environment</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Map of additional environment variables to set for the job</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">empty</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-gpu</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">An additional number of GPUs that should be added to whatever the job originally requested</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.additional-job-attributes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map of attributes to send with the Titus request in addition to whatever defaults there are</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
@@ -5393,6 +5408,24 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.command-template</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The container command array, placeholder values are substituted at runtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[exec, --api-job, --launchInJobDirectory, --job-id, &lt;JOB_ID&gt;, --server-host, &lt;SERVER_HOST&gt;, --server-port, &lt;SERVER_PORT&gt;]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.container-attributes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map attributes to send to Titus specific to the container</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.detail</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The detail (jobGroupInfo) within the application space for Titus request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether the Titus agent launcher is active or not</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
@@ -5406,9 +5439,9 @@ data source. See
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.entry-point-template</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The container entry point expression, placeholder values are substituted at runtime</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">[/bin/genie-agent, exec, --api-job, --launchInJobDirectory, --job-id, &lt;JOB_ID&gt;, --server-host, &lt;SERVER_HOST&gt;, --server-port, &lt;SERVER_PORT&gt;]</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The container entry point array, placeholder values are substituted at runtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[/bin/genie-agent]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.genie-server-host</p></td>
@@ -5510,6 +5543,18 @@ data source. See
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.security-groups</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A list of security groups for the job</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">empty list</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.sequence</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The sequence (jobGroupInfo) within the application space for Titus request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.agent.launcher.titus.stack</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The stack (jobGroupInfo) within the application space for Titus request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">empty string</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5673,7 +5718,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.jobs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job working directories will be placed. Created by system if doesn&#8217;t exist.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}genie/jobs/" class="bare">file://${java.io.tmpdir}genie/jobs/</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file://${java.io.tmpdir}/genie/jobs/" class="bare">file://${java.io.tmpdir}/genie/jobs/</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
@@ -5872,13 +5917,6 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.swagger.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable <a href="http://swagger.io/">Swagger</a> to be bootstrapped into the Genie service so that the endpoint
-/swagger-ui.html shows API documentation generated by the swagger specification</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.agent-cleanup.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable the task that detects jobs whose agent has gone AWOL, and marks them failed</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
@@ -5948,14 +5986,7 @@ of 2.0</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.command-deactivation.commandCreationThreshold</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days before the current cleanup run that a command must have been created before in the system to be
 considered for deactivation.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.command-deactivation.jobCreationThreshold</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days before the current cleanup run that command must not have been used in a job for that command to be
-considered for deactivation.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
 </tr>
 <tr>
@@ -6052,6 +6083,13 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.user-metrics.split-by-submission-mode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to additionally publish per-user metrics broken down by submission mode (<code>mode=api</code> vs <code>mode=agent</code>)
+under separate <code>*.by-submission-mode.gauge</code> names. Leaves the existing gauges unchanged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.zookeeper.discovery-path</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie discovery service (maps agents to the node they&#8217;re connected to)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/discovery/</p></td>
@@ -6069,7 +6107,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a><a class="link" href="#_spring_properties">12.1.2. Spring Properties</a></h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -6211,7 +6249,7 @@ returned</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/2.3.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
@@ -6375,8 +6413,8 @@ See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for
 <p>Unless otherwise noted, properties are loaded from the standard sources (defaults, profiles, other files).
 The server also has a chance to override them during the 'Agent Configuration' execution stage.</p>
 </div>
-<div class="sect3">
-<h4 id="_properties_forwarding"><a class="anchor" href="#_properties_forwarding"></a><a class="link" href="#_properties_forwarding">13.1. Properties forwarding</a></h4>
+<div class="sect2">
+<h3 id="_properties_forwarding"><a class="anchor" href="#_properties_forwarding"></a><a class="link" href="#_properties_forwarding">13.1. Properties forwarding</a></h3>
 <div class="paragraph">
 <p>Server-side properties that match a given prefix are forwarded to all agents during agent configuration stage.
 For a property to be forwarded, it needs to be prefixed with <code>genie.agent.configuration.dynamic.</code>.</p>
@@ -7235,7 +7273,7 @@ database cannot be found</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2021-02-10 01:24:46 UTC
+Last updated 2026-10-24 09:26:29 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
